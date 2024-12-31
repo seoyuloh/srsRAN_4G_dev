@@ -93,6 +93,11 @@ int ue::init(const all_args_t& args_)
   phy_args_nr.store_pdsch_ko       = args.phy.nr_store_pdsch_ko;
   phy_args_nr.srate_hz             = args.rf.srate_hz;
 
+  phy_args_nr.tuner_enable        = args.phy.tuner_enable;
+  phy_args_nr.tuner_name          = args.phy.tuner_name;
+  phy_args_nr.domain_socket_name  = args.phy.domain_socket_name;
+
+
   // init layers
   if (args.phy.nof_lte_carriers == 0) {
     // SA mode

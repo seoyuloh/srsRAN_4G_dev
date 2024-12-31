@@ -107,6 +107,11 @@ struct phy_args_t {
 
   bool nr_store_pdsch_ko = false;
 
+  //tuner
+  bool                   tuner_enable          = false;
+  std::string tuner_name;
+  std::string domain_socket_name;
+
   float    in_sync_rsrp_dbm_th    = -130.0f;
   float    in_sync_snr_db_th      = 1.0f;
   uint32_t nof_in_sync_events     = 10;

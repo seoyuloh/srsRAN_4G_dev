@@ -36,6 +36,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <srsran/common/tti_sempahore.h>
+#include "srsran/phy/channel/tuner.h"
 
 namespace srsue {
 namespace nr {
@@ -54,6 +55,10 @@ public:
     float                       pbch_dmrs_thr   = 0.0f; ///< PBCH DMRS correlation detection threshold (0 means auto)
     float                       cfo_alpha       = 0.0f; ///< CFO averaging alpha (0 means auto)
     int                         thread_priority = 1;
+
+    bool    tuner_enable         = false;
+    std::string tuner_name;
+    std::string domain_socket_name;
 
     cell_search::args_t get_cell_search() const
     {
@@ -80,6 +85,8 @@ public:
   bool                reset();
   void                stop();
   sync_state::state_t get_state();
+
+  std::unique_ptr<srsran_channel_tuner_t>              tuner;
 
   // The following methods control the SYNC state machine
   void                                       cell_go_idle();

@@ -87,7 +87,6 @@ public:
 private:
   srslog::basic_logger&    logger;
   float                    hst_init_phase              = 0.0f;
-  float                    attenuation                 = 1.0f;
   srsran_channel_fading_t* fading[SRSRAN_MAX_CHANNELS] = {};
   srsran_channel_delay_t*  delay[SRSRAN_MAX_CHANNELS]  = {};
   srsran_channel_awgn_t*   awgn                        = nullptr;

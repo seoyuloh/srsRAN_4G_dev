@@ -256,7 +256,6 @@ static int parse_args(all_args_t* args, int argc, char* argv[])
     ("channel.ul.tuner.enable",      bpo::value<bool>(&args->phy.ul_channel_args.tuner_enable)->default_value(false),            "Enable/Disable tuner model")
     ("channel.ul.tuner.name",        bpo::value<std::string>(&args->phy.ul_channel_args.tuner_name)->default_value("Tuner"),  "Name of the tuner")
     ("channel.ul.tuner.socket",      bpo::value<std::string>(&args->phy.ul_channel_args.domain_socket_name)->default_value("/tmp/uetuner.sock"), "Domain socket name for tuner")
-    // todo: add tuner config parsing here
 
 
     /* CFR section */
@@ -451,6 +450,19 @@ static int parse_args(all_args_t* args, int argc, char* argv[])
     ("phy.nr.store_pdsch_ko",
       bpo::value<bool>(&args->phy.nr_store_pdsch_ko)->default_value(false),
       "Dumps the PDSCH baseband samples into a file on KO reception.")
+
+    // Tuner args 1231
+    ("phy.nr.tuner_enable",
+      bpo::value<bool>(&args->phy.tuner_enable)->default_value(false),
+      "Enables Tuner")
+
+    ("phy.nr.tuner_name",
+      bpo::value<std::string>(&args->phy.tuner_name)->default_value("Tuner"),
+      "Name of the tuner")
+
+    ("phy.nr.domain_socket_name",
+      bpo::value<std::string>(&args->phy.domain_socket_name)->default_value("/tmp/uetuner.sock"),
+      "Path to the domain socket")
 
     // UE simulation args
     ("sim.airplane_t_on_ms",

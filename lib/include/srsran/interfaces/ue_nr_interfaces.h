@@ -232,6 +232,10 @@ struct phy_args_nr_t {
   float                  trs_cfo_ema_alpha     = 0.1f; ///< RSRP measurement exponential average alpha
   bool                   enable_worker_cfo     = true; ///< Enable/Disable open loop CFO correction at the workers
 
+  bool                   tuner_enable          = false;
+  std::string tuner_name;
+  std::string domain_socket_name;
+
   phy_args_nr_t()
   {
     dl.nof_rx_antennas        = 1;
