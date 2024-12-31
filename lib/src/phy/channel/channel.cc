@@ -127,6 +127,7 @@ channel::channel(const channel::args_t& channel_args, uint32_t _nof_channels, sr
   if (ret != SRSRAN_SUCCESS) {
     fprintf(stderr, "Error: Creating channel\n\n");
   }
+  logger.debug("Creating channel success");
 }
 
 channel::~channel()

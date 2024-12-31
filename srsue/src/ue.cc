@@ -83,7 +83,7 @@ int ue::init(const all_args_t& args_)
     return SRSRAN_ERROR;
   }
 
-  srsue::phy_args_nr_t phy_args_nr = {};
+  srsue::phy_args_nr_t phy_args_nr = {}; // put tuner arguments here
   phy_args_nr.max_nof_prb          = args.phy.nr_max_nof_prb;
   phy_args_nr.rf_channel_offset    = args.phy.nof_lte_carriers;
   phy_args_nr.nof_carriers         = args.phy.nof_nr_carriers;

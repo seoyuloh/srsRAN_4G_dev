@@ -19,6 +19,7 @@
  *
  */
 
+#include <memory>
 #include <sstream>
 #include <string.h>
 
@@ -62,8 +63,8 @@ void phy_common::init(phy_args_t*                  _args,
 
   // Instantiate UL channel emulator
   if (args->ul_channel_args.enable) {
-    ul_channel = srsran::channel_ptr(
-        new srsran::channel(args->ul_channel_args, args->nof_lte_carriers * args->nof_rx_ant, logger));
+    ul_channel = std::make_unique<srsran::channel>(
+        args->ul_channel_args, args->nof_lte_carriers * args->nof_rx_ant, logger);
   }
 
   // Init the CFR config struct with the CFR args
