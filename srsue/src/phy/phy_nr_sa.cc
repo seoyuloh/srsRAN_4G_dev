@@ -110,7 +110,6 @@ void phy_nr_sa::init_background()
   sync_args.tuner_enable        = args.tuner_enable;
   sync_args.tuner_name          = args.tuner_name;
   sync_args.domain_socket_name  = args.domain_socket_name;
-  sync.init(sync_args, stack, radio);
 
   if (not sync.init(sync_args, stack, radio)) {
     logger.error("Error initialising SYNC");

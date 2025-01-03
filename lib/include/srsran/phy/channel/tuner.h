@@ -6,6 +6,7 @@
 #include "srsran/srslog/logger.h"
 #include <atomic>
 #include <fstream>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <thread>
@@ -24,10 +25,9 @@ public:
                          const std::string&    tuner_name         = "Tuner",
                          const std::string&    domain_socket_name = "/tmp/uetuner.sock",
                          float                 attenuation        = 1.0f) :
-    tuner_attenuation(attenuation), logger(logger_ref), domain_socket_name(domain_socket_name)
+    tuner_attenuation(attenuation), logger(logger_ref), domain_socket_name(domain_socket_name), sock(domain_socket_name)
   {
-    sock.open(tuner_name);
-
+    std::cout<<"tuner: "<<tuner_name<<"\n";
     // Initialize the thread in the constructor
     tuner_monitor_thread = std::make_unique<std::thread>([this]() {
       float new_gain;
@@ -35,7 +35,7 @@ public:
         sock >> new_gain;
         if (sock) {
           tuner_attenuation.store(new_gain, std::memory_order_relaxed);
-          logger.info("Attenuation changed to {}", new_gain);
+          logger.info("Attenuation changed to %f", new_gain);
         } else {
           sock.clear();
         }

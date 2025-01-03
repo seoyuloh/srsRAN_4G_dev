@@ -75,7 +75,7 @@ bool sync_sa::init(const args_t& args, stack_interface_phy_nr* stack_, srsran::r
 
   // Initializing Tuner
   logger.debug("Initializing Tuner with name: {}", args.tuner_name); // Debug log output
-  tuner = std::make_unique<srsran_channel_tuner_t>(logger, args.tuner_name); // moved tuner creation to init
+  tuner = std::make_unique<srsran_channel_tuner_t>(logger, args.tuner_name, args.domain_socket_name); // moved tuner creation to init
 
   // If reached here it was successful
   return true;
