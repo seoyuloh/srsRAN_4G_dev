@@ -378,7 +378,7 @@ void sync_sa::worker_end(const srsran::phy_common_interface::worker_context_t& w
     // added tuning here
     if (tuner) {
       srsran_channel_tuner_execute(tuner.get(), tx_buffer.get(0), buffer_out, tx_buffer.get_nof_samples());
-      srsran_vec_cf_copy(buffer_out, tx_buffer.get(0), tx_buffer.get_nof_samples());
+      srsran_vec_cf_copy(tx_buffer.get(0),buffer_out,tx_buffer.get_nof_samples());
     }
 
     radio->tx(tx_buffer, tx_time);
