@@ -21,6 +21,7 @@
 
 #include "srsue/hdr/phy/nr/sync_sa.h"
 #include "srsran/radio/rf_buffer.h"
+#include "srsran/phy/channel/tuner.h"
 
 namespace srsue {
 namespace nr {
@@ -71,6 +72,10 @@ bool sync_sa::init(const args_t& args, stack_interface_phy_nr* stack_, srsran::r
   // Thread control
   running = true;
   start(args.thread_priority);
+
+  // Initializing Tuner
+  logger.debug("Initializing Tuner with name: {}", args.tuner_name); // Debug log output
+  tuner = std::make_unique<srsran_channel_tuner_t>(logger, args.tuner_name, args.domain_socket_name); // moved tuner creation to init
 
   // If reached here it was successful
   return true;
@@ -364,9 +369,18 @@ void sync_sa::worker_end(const srsran::phy_common_interface::worker_context_t& w
   srsran::rf_timestamp_t tx_time = w_ctx.tx_time; // get transmit time from the last worker
   // todo: tx_time.sub((double)ta.get_sec());
 
+  cf_t* buffer_out = srsran_vec_cf_malloc(tx_buffer.get_nof_samples());
+
   // Check if any worker had a transmission
   if (tx_enable) {
     // Actual baseband transmission
+
+    // added tuning here
+    if (tuner) {
+      srsran_channel_tuner_execute(tuner.get(), tx_buffer.get(0), buffer_out, tx_buffer.get_nof_samples());
+      srsran_vec_cf_copy(tx_buffer.get(0),buffer_out,tx_buffer.get_nof_samples());
+    }
+
     radio->tx(tx_buffer, tx_time);
   } else {
     if (radio->is_continuous_tx()) {
@@ -385,6 +399,7 @@ void sync_sa::worker_end(const srsran::phy_common_interface::worker_context_t& w
     }
   }
 
+  free(buffer_out);
   // Allow next TTI to transmit
   tti_semaphore.release();
 }

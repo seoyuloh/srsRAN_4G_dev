@@ -22,6 +22,13 @@
 #include <cstdlib>
 #include <srsran/phy/channel/channel.h>
 #include <srsran/srsran.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <atomic>
+#include <iostream>
+#include <thread>
+#include <srsran/phy/utils/vector.h>
+#include <cstring>
 
 using namespace srsran;
 
@@ -94,9 +101,33 @@ channel::channel(const channel::args_t& channel_args, uint32_t _nof_channels, sr
     srsran_channel_rlf_init(rlf, channel_args.rlf_t_on_ms, channel_args.rlf_t_off_ms);
   }
 
+  // Create Tuner
+  if (channel_args.tuner_enable && ret == SRSRAN_SUCCESS) {
+    logger.debug("Initializing Tuner with name: {}", channel_args.tuner_name); // Debug log output
+    tuner = std::make_unique<srsran_channel_tuner_t>(logger, channel_args.tuner_name);
+    logger.info("Tuner initialized successfully."); // Additional log to confirm initialization
+
+    //
+    // // this->tuner->sock.open(channel_args.tuner_name);
+    // tuner->tuner_monitor_thread = std::make_unique<std::thread>([this, &logger]{
+    //   float new_gain;
+    //   do {
+    //     this->tuner->sock >> new_gain;
+    //     if (this->tuner->sock) {
+    //       this->tuner->tuner_attenuation.store(new_gain, std::memory_order_relaxed);
+    //       logger.info("Attenuation changed to {}", new_gain);
+    //     } else {
+    //       this->tuner->sock.clear();
+    //     }
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    //   } while (new_gain > 0);
+    // });
+  }
+
   if (ret != SRSRAN_SUCCESS) {
     fprintf(stderr, "Error: Creating channel\n\n");
   }
+  logger.debug("Creating channel success");
 }
 
 channel::~channel()
@@ -123,6 +154,12 @@ channel::~channel()
     srsran_channel_rlf_free(rlf);
     free(rlf);
   }
+
+  // if (tuner) { //
+  //   // srsran_channel_tuner_free(tuner);
+  //   // free(tuner);
+  //   srsran_channel_tuner_free(tuner.get());
+  // }
 
   for (uint32_t i = 0; i < nof_channels; i++) {
     if (fading[i]) {
@@ -197,6 +234,11 @@ void channel::run(cf_t*                     in[SRSRAN_MAX_CHANNELS],
 
     if (rlf) {
       srsran_channel_rlf_execute(rlf, buffer_in, buffer_out, len, &t);
+      srsran_vec_cf_copy(buffer_in, buffer_out, len);
+    }
+
+    if (tuner) {
+      srsran_channel_tuner_execute(tuner.get(), buffer_in, buffer_out, len);
       srsran_vec_cf_copy(buffer_in, buffer_out, len);
     }
 

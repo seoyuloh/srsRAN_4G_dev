@@ -97,7 +97,6 @@ int phy_nr_sa::init(const phy_args_nr_t& args_, stack_interface_phy_nr* stack_, 
   is_configured = false;
   std::thread t([this]() { init_background(); });
   init_thread = std::move(t);
-
   return SRSRAN_SUCCESS;
 }
 
@@ -106,6 +105,12 @@ void phy_nr_sa::init_background()
   nr::sync_sa::args_t sync_args = {};
   sync_args.srate_hz            = args.srate_hz;
   sync_args.thread_priority     = args.slot_recv_thread_prio;
+
+  //add tuner args to sync_args
+  sync_args.tuner_enable        = args.tuner_enable;
+  sync_args.tuner_name          = args.tuner_name;
+  sync_args.domain_socket_name  = args.domain_socket_name;
+
   if (not sync.init(sync_args, stack, radio)) {
     logger.error("Error initialising SYNC");
     return;
