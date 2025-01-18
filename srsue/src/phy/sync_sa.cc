@@ -371,6 +371,20 @@ void sync_sa::worker_end(const srsran::phy_common_interface::worker_context_t& w
 
   cf_t* buffer_out = srsran_vec_cf_malloc(tx_buffer.get_nof_samples());
 
+  static int frame_counter = 0; // Persistent across function calls
+  const int log_frequency = 1000; // Log every 1000th call
+
+  frame_counter++;
+
+  // Perform logging only if the counter matches the logging frequency
+  if (frame_counter % log_frequency == 0) {
+    // Log raw I/Q samples (before tuner processing)
+    std::ofstream iq_log_before("/home/seoyul/5g/logs/iq_samples_before_tuner.dat", std::ios::binary | std::ios::app);
+    iq_log_before.write(reinterpret_cast<const char*>(tx_buffer.get(0)),
+                        tx_buffer.get_nof_samples() * sizeof(std::complex<float>));
+    iq_log_before.close();
+  }
+
   // Check if any worker had a transmission
   if (tx_enable) {
     // Actual baseband transmission
@@ -378,6 +392,15 @@ void sync_sa::worker_end(const srsran::phy_common_interface::worker_context_t& w
     // added tuning here
     if (tuner) {
       srsran_channel_tuner_execute(tuner.get(), tx_buffer.get(0), buffer_out, tx_buffer.get_nof_samples());
+
+      // Log processed I/Q samples (after tuner processing)
+      if (frame_counter % log_frequency == 0) {
+        std::ofstream iq_log_after("/home/seoyul/5g/logs/iq_samples_after_tuner.dat", std::ios::binary | std::ios::app);
+        iq_log_after.write(reinterpret_cast<const char*>(buffer_out),
+                           tx_buffer.get_nof_samples() * sizeof(std::complex<float>));
+        iq_log_after.close();
+      }
+
       srsran_vec_cf_copy(tx_buffer.get(0),buffer_out,tx_buffer.get_nof_samples());
     }
 
